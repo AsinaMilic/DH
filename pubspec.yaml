@@ -40,6 +40,7 @@ dependencies:
   path: ^1.8.0
   crypto: ^3.0.1
   path_provider: ^2.0.14
+  adaptive_dialog: ^2.3.0
 
 dev_dependencies:
   flutter_test:

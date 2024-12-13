@@ -4,6 +4,7 @@ import 'dart:core';
 
 import '../database/database_helper.dart';
 import '../models/user.dart';
+import 'first_screen.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -88,6 +89,12 @@ class LoginPage extends StatelessWidget {
         onLogin: _authUser,
         onRecoverPassword: _recoverPassword,
         onSignup: _signupUser,
+        onSubmitAnimationCompleted: () {
+        // Preusmeri korisnika na FirstScreen nakon uspesnog logina
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => FirstScreen()),
+          );
+        },
       ),
     );
   }
