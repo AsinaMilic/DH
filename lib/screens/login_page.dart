@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
+import 'package:just_work/screens/question_screen.dart';
 import 'dart:core';
 
 import '../database/database_helper.dart';
 import '../models/user.dart';
-import 'first_screen.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
-  //loading time..
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  late int userId; // Add a field to store the userId
+
+  // Loading time
   Duration get loadingTime => const Duration(milliseconds: 2000);
 
-  // login
+  // Login
   Future<String?> _authUser(LoginData data) async {
     String email = data.name;
     String password = data.password;
@@ -21,6 +28,7 @@ class LoginPage extends StatelessWidget {
     if (user != null) {
       String hashedInput = dbHelper.hashPassword(password);
       if (hashedInput == user.passwordHash) {
+        userId = user.id!; // Store userId
         return null; // Success
       } else {
         return 'Invalid password'; // Error message
@@ -30,17 +38,16 @@ class LoginPage extends StatelessWidget {
     }
   }
 
-  // forgot password
+  // Forgot password
   Future<String?> _recoverPassword(String data) {
     return Future.delayed(loadingTime).then((value) => null);
   }
 
-  // sign up
+  // Sign up
   Future<String?> _signupUser(SignupData data) async {
     String? email = data.name;
     String? password = data.password;
 
-    // Validate email and password
     if (email == null || !_isEmailValid(email)) {
       return 'Please enter a valid email';
     }
@@ -56,10 +63,15 @@ class LoginPage extends StatelessWidget {
         return 'Email already in use';
       } else {
         String hashedPassword = dbHelper.hashPassword(password);
-        // Create User object with id set to null
         User newUser = User(username: email, email: email, passwordHash: hashedPassword);
         int result = await dbHelper.insertUser(newUser);
         if (result > 0) {
+          userId = result;
+          try {
+            await dbHelper.insertPredefinedQuestions(userId);
+          } catch (e) {
+            return 'Failed to insert predefined questions: $e';
+          }
           return null; // Success
         } else {
           return 'Sign up failed';
@@ -90,9 +102,11 @@ class LoginPage extends StatelessWidget {
         onRecoverPassword: _recoverPassword,
         onSignup: _signupUser,
         onSubmitAnimationCompleted: () {
-        // Preusmeri korisnika na FirstScreen nakon uspesnog logina
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => FirstScreen()),
+          // Navigate to QuestionsScreen with the userId
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => QuestionsScreen(userId: userId),
+            ),
           );
         },
       ),

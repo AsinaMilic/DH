@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:just_work/screens/first_screen.dart';
 import 'screens/login_page.dart';
 
 void main() {
@@ -15,7 +14,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: LoginPage(),
-      //home: FirstScreen(), //for testing purposes
     );
   }
 }
